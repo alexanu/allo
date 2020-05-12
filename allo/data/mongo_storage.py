@@ -5,7 +5,6 @@ import pandas as pd
 from bson import ObjectId
 
 from data.series import RSeries
-# from data.multi_series import RSeriesMulti
 from data.init_mongo import InitMongo
 
 class MongoStorage():
@@ -47,17 +46,20 @@ class MongoStorage():
     def Save(self, series_list, db_name = "AnalysisEvo", coll_name = "Strategy"):
         if not isinstance(series_list, list):
             series_list = [series_list]
+
         db = self.client[db_name]
         collection = db[coll_name]
+
         doc_list = [dict(info = SSeries.info, data = SSeries.df.reset_index().to_dict(orient = "rows")) for SSeries in series_list]
         collection.insert_many(doc_list)
 
     # Delete list of series
     def Delete(self, to_remove_id_list, db_name = "AnalysisEvo", coll_name = "Strategy"):
+        db = self.client[db_name]
+        coll = db[coll_name]
+
         try:
             to_remove_id_list = [ObjectId(j) for j in to_remove_id_list]
-            db = self.client[db_name]
-            coll = db[coll_name]
             myquery = { "_id": {"$in":  to_remove_id_list}}
             newvalues = { "$set": { "User": "Deleted" } }
             x = coll.update_many(myquery, newvalues)
