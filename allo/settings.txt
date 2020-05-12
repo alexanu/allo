@@ -1,0 +1,26 @@
+{
+    "mongo_uri": "mongodb://127.0.0.1:27017",
+
+
+
+
+    "reference_settings_below": "-----",
+    "mongo_default_uri": "mongodb://127.0.0.1:27017",
+    "mongo_localcxt_uri": "mongodb://cxtanalytics:3.1415cxt@127.0.0.1:27017",
+    "mongo_maincxt_uri": "mongodb://cxtanalytics:3.1415cxt@192.168.1.110:27017",
+    "mongo_remote_uri": "mongodb+srv://junyitt:Qw9L70UqE9gsyNMu@analysisevo-4utjq.mongodb.net/test?retryWrites=true",
+
+    "deprecated_settings_below": "-----",
+
+    "mongo_localcxt_user": "cxtanalytics", 
+    "mongo_localcxt_pw": "3.1415cxt",
+    "mongo_localcxt_ip": "",
+    "mongo_localcxt_port": "27017",
+    "mongo_localcxt_init_method": "local", 
+
+    "mongo_remote_user": "junyitt",
+    "mongo_remote_pw": "Qw9L70UqE9gsyNMu",
+    "mongo_remote_init_method": "remote_atlas_1",
+
+    "credential_path_select": "popos"
+}
