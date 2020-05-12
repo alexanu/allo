@@ -12,8 +12,8 @@ class MongoStorage():
         self.client = mongo_client = InitMongo(client = client)
      
     # Find series based on find_filter (return metadata_list_dict or id_list)
-    def Find(self, find_filter = {}, id_only = False, db_name = "AnalysisEvo", coll_name = "Strategy", delete_filter = {"User": {"$nin": ["Deleted"]}}):
-        find_filter = {**find_filter, **delete_filter}
+    def Find(self, find_filter = {}, id_only = False, db_name = "AnalysisEvo", coll_name = "Strategy"):
+        # delete_filter = {"User": {"$nin": ["Deleted"]}}
 
         db = self.client[db_name]
         coll = db[coll_name]

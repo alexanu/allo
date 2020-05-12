@@ -1,5 +1,5 @@
 from selector import custom_select
-
+from helper.time import timeit
 
 class Selector(object):
     """Selector class. 
@@ -27,5 +27,7 @@ class Selector(object):
         
         # self.log("Selected {} strategies by {}: {}".format(len(selected_strategy_list), select_method, str(selected_strategy_list)), "Select_1")
         # self.log("Removed {} strategies by {}: {}".format(len(to_remove_strat), select_method, str(to_remove_strat)), "Select_2")
+        self.output_df, self.exclude_select_meta_df = output_df, exclude_select_meta_df
 
-        return output_df, exclude_select_meta_df
+    def get_output(self):
+        return self.output_df, self.exclude_select_meta_df 

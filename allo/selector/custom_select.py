@@ -1,5 +1,6 @@
 """Contains custom selection of strategies methods
 """
+import six
 import time
 import random
 import datetime

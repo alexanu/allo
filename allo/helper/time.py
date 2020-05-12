@@ -12,8 +12,8 @@ def timeit(method):
         result = method(*args, **kw)
         te = time.time()
 
-        verbose = kwargs.get("verbose")
-        verbose = set_default(set_default, 2)
+        verbose = kw.get("verbose")
+        verbose = set_default(verbose, 2)
         if verbose > 1:
             print("{}: {} seconds.".format(method.__name__, te-ts))
     return timed

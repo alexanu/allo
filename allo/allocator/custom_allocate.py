@@ -2,6 +2,8 @@
 """
 import six
 import warnings
+import datetime
+import functools
 import numpy as np
 import pandas as pd
 
@@ -18,12 +20,14 @@ def get_df_combined_from_rs_list(rs_list, d1 = datetime.datetime(2000,1,1), d2 =
         temp_df = rs.df.loc[d1:d2].copy()
         temp_df.columns = [rs.Name]
         df_list.append(temp_df)
-    df_combined = df_list_merge(df_list, "outer")
+    
+    df_combined = functools.reduce(lambda left,right: pd.merge(left, right, left_index=True, right_index=True, how="outer"), df_list)
+    # df_combined = df_list_merge(df_list, "outer")
     return df_combined
 
 
 def constrained_risk_parity(rseries_list, strategy_list, a1, a2, upperbound, **kwargs):
-    """Constrained Risk Parity (CRP) using std dev (volatility) as risk measure""""
+    """Constrained Risk Parity (CRP) using std dev (volatility) as risk measure"""
     sd_list = []
     for rs in rseries_list:
         rdf = rs.df.copy().loc[a1:a2]
@@ -35,7 +39,7 @@ def constrained_risk_parity(rseries_list, strategy_list, a1, a2, upperbound, **k
 
 
 def constrained_tail_risk_parity(rseries_list, strategy_list, a1, a2, upperbound, tail_p, **kwargs):
-    """Constrained Tail Risk Parity (CRPT) using Expected Tail Loss (ETL) as risk measure""""
+    """Constrained Tail Risk Parity (CRPT) using Expected Tail Loss (ETL) as risk measure"""
     sd_list = []
     for rs in rseries_list:
         rdf = rs.df.copy().loc[a1:a2]
@@ -47,7 +51,7 @@ def constrained_tail_risk_parity(rseries_list, strategy_list, a1, a2, upperbound
 
 
 def constrained_max_sharpe(rseries_list, a1, a2, lowerbound, upperbound, optimize_method = None, **kwargs):
-    """Constrained Max Sharpe (CMS)""""
+    """Constrained Max Sharpe (CMS)"""
     allocate_back_df = get_df_combined_from_rs_list(rs_list = rseries_list, d1 = a1, d2 = a2).fillna(0)
 
     fun = optimize.lambda_optimize.get("Weights_MaxSharpePenalty_fun")
@@ -78,7 +82,7 @@ def avg_cms_crpt(rseries_list, strategy_list, a1, a2, lowerbound, upperbound, ta
 
 
 def chrp(rseries_list, a1, a2, upperbound, **kwargs):
-    """Constrained Hierarchical Risk Parity""""
+    """Constrained Hierarchical Risk Parity"""
     allocate_back_df = get_df_combined_from_rs_list(rs_list = rseries_list, d1 = a1, d2 = a2).fillna(0)
     w = optimize.optimize.optimize_hrp(allocate_back_df)
     w2 = [j for j in w.values()]

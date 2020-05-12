@@ -1,3 +1,4 @@
+import datetime
 import numpy as np
 import pandas as pd 
 
@@ -43,6 +44,7 @@ class Allocator(object):
         output_df["weight"] = output_df["weight"].replace(weights_dict)
 
         # Adjustment for forced min weights
-        output_df = adjust_forced_min_weight(output_df, strat_min_alloc) 
+        self.output_df = adjust_forced_min_weight(output_df, strat_min_alloc) 
         
-        return output_df
+    def get_output(self):
+        return self.output_df
