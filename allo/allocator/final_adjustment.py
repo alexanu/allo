@@ -43,6 +43,9 @@ def sequential_distribute_min_weight(w, min_threshold = 0.008):
     # Then scale the rest by a factor of k such that the sum of weights is 1.
     # Repeat the process until all weights are either zero or above min_threshold.
     """
+    if min_threshold == 0:
+        return w
+
     w = np.array(w)
     w[np.isnan(w)] = 0
     
@@ -68,7 +71,7 @@ def adjust_forced_min_weight(mdf, strat_min_alloc):
         return mdf # no adjustment
         
     min_allocs = list(strat_min_alloc.values())
-    mdf["old_weight_2"] = mdf["weight"].copy()
+    mdf["weight_1"] = mdf["weight"].copy()
     min_sum_weight = 0
     for strat, min_alloc in strat_min_alloc.items():
         u1 = mdf["Name"] == strat
