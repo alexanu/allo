@@ -22,7 +22,7 @@ def get_df_combined_from_rs_list(rs_list, d1 = datetime.datetime(2000,1,1), d2 =
     return df_combined
 
 
-def constrained_risk_parity(rseries_list, strategy_list, a1, a2, upperbound):
+def constrained_risk_parity(rseries_list, strategy_list, a1, a2, upperbound, **kwargs):
     """Constrained Risk Parity (CRP) using std dev (volatility) as risk measure""""
     sd_list = []
     for rs in rseries_list:
@@ -34,7 +34,7 @@ def constrained_risk_parity(rseries_list, strategy_list, a1, a2, upperbound):
     return w
 
 
-def constrained_tail_risk_parity(rseries_list, strategy_list, a1, a2, upperbound, tail_p):
+def constrained_tail_risk_parity(rseries_list, strategy_list, a1, a2, upperbound, tail_p, **kwargs):
     """Constrained Tail Risk Parity (CRPT) using Expected Tail Loss (ETL) as risk measure""""
     sd_list = []
     for rs in rseries_list:
@@ -46,7 +46,7 @@ def constrained_tail_risk_parity(rseries_list, strategy_list, a1, a2, upperbound
     return w
 
 
-def constrained_max_sharpe(rseries_list, a1, a2, lowerbound, upperbound, optimize_method = None):
+def constrained_max_sharpe(rseries_list, a1, a2, lowerbound, upperbound, optimize_method = None, **kwargs):
     """Constrained Max Sharpe (CMS)""""
     allocate_back_df = get_df_combined_from_rs_list(rs_list = rseries_list, d1 = a1, d2 = a2).fillna(0)
 
@@ -57,7 +57,7 @@ def constrained_max_sharpe(rseries_list, a1, a2, lowerbound, upperbound, optimiz
     return w
 
 
-def avg_cms_crp(rseries_list, strategy_list, a1, a2, lowerbound, upperbound, weights = (1,1)):
+def avg_cms_crp(rseries_list, strategy_list, a1, a2, lowerbound, upperbound, weights = (1,1), **kwargs):
     """Weighted average of CMS and CRP"""
     w1 = constrained_max_sharpe(rseries_list, a1, a2, lowerbound, upperbound, optimize_method = None)
     w2 = constrained_risk_parity(rseries_list, strategy_list, a1, a2, upperbound)
@@ -67,7 +67,7 @@ def avg_cms_crp(rseries_list, strategy_list, a1, a2, lowerbound, upperbound, wei
     return w
 
 
-def avg_cms_crpt(rseries_list, strategy_list, a1, a2, lowerbound, upperbound, tail_p, weights = (1,1)):
+def avg_cms_crpt(rseries_list, strategy_list, a1, a2, lowerbound, upperbound, tail_p, weights = (1,1), **kwargs):
     """Weighted average of CMS and CRPT"""
     w1 = constrained_max_sharpe(rseries_list, a1, a2, lowerbound, upperbound, optimize_method = None)
     w2 = constrained_tail_risk_parity(rseries_list, strategy_list, a1, a2, upperbound, tail_p)
@@ -77,7 +77,7 @@ def avg_cms_crpt(rseries_list, strategy_list, a1, a2, lowerbound, upperbound, ta
     return w
 
 
-def chrp(rseries_list, a1, a2, upperbound):
+def chrp(rseries_list, a1, a2, upperbound, **kwargs):
     """Constrained Hierarchical Risk Parity""""
     allocate_back_df = get_df_combined_from_rs_list(rs_list = rseries_list, d1 = a1, d2 = a2).fillna(0)
     w = optimize.optimize.optimize_hrp(allocate_back_df)
@@ -88,21 +88,21 @@ def chrp(rseries_list, a1, a2, upperbound):
     return w
 
 
-def cewms(rseries_list, a1, a2, lowerbound, upperbound):
+def cewms(rseries_list, a1, a2, lowerbound, upperbound, **kwargs):
     """Constrained Exponential Weighted Max Sharpe"""
     allocate_back_df = get_df_combined_from_rs_list(rs_list = rseries_list, d1 = a1, d2 = a2).fillna(0)
     w = optimize.optimize.optimize_max_sharpe(allocate_back_df, lowerbound, upperbound)
     return w
 
 
-def equal_weight(rseries_list, a1, a2):
+def equal_weight(rseries_list, a1, a2, **kwargs):
     """Equal weight"""
     allocate_back_df = get_df_combined_from_rs_list(rs_list = rseries_list, d1 = a1, d2 = a2).fillna(0)
     w = optimize.optimize.optimize_equal_weight(allocate_back_df)
     return w
 
 
-def replicate_minimize_lookback_square_error(rseries_list, a1, a2, lowerbound, upperbound, target_ret, optimize_method = None, constraint = True):
+def replicate_minimize_lookback_square_error(rseries_list, a1, a2, lowerbound, upperbound, target_ret, optimize_method = None, constraint = True, **kwargs):
     """For Replicate: Minimize the lookback square error of optimized returns and target returns"""
     allocate_back_df = get_df_combined_from_rs_list(rs_list = rseries_list, d1 = a1, d2 = a2).fillna(0)
     fun = optimize.lambda_optimize.get("Weights_MinTargetErr")
@@ -149,4 +149,4 @@ def get(identifier):
         return identifier
     else:
         raise ValueError('Could not interpret '
-                         'allocator.method function identifier:', identifier)
+                         'allocator.custom_allocate function identifier:', identifier)
