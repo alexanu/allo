@@ -1,0 +1,9 @@
+*.csv
+*.pkl
+*.pyc
+
+**/__pycache__
+**/.Rhistory
+**/.ipynb_checkpoints
+/analysis_evo/cache
+/Return_*
