@@ -20,7 +20,7 @@ class Allocator(object):
     # Methods
     NA
     """
-    @timeit
+    # @timeit
     def __init__(self, track_df, allocate_method, a1, a2, adj_lowerbound = 0, strat_min_alloc = {}, **kwargs):
         rseries_list = track_df["rs"].values
         strategy_list = track_df["Name"].values
