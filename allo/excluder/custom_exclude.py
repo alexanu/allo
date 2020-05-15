@@ -13,13 +13,13 @@ from allocator.custom_allocate import get_df_combined_from_rs_list
 # from google.google_sheet import StrategyMeta
 
 
-def exclude_high_correlation(track_df, b_enddate, corr_threshold = 0.8, **kwargs):
+def exclude_high_correlation(track_df, enddate, corr_threshold = 0.8, **kwargs):
     """Exclude strategies that are highly correlated with another
     """    
     rs_list = track_df["rs"].values
     
     # Calculate correlation
-    df_combined = get_df_combined_from_rs_list(rs_list = rs_list, d2 = b_enddate)
+    df_combined = get_df_combined_from_rs_list(rs_list = rs_list, d2 = enddate)
     cr = df_combined.corr().abs()
     
     # Remove strategy that has high correlation with others
@@ -44,22 +44,23 @@ def exclude_high_correlation(track_df, b_enddate, corr_threshold = 0.8, **kwargs
     return track_df, exclude_corr_meta_df
 
 
-def exclude_seasonality_month(track_df, b_enddate, f_startdate, f_enddate, **kwargs):
+def exclude_seasonality_month(track_df, enddate, f1, f2, **kwargs):
     """Exclude seasonality strategies that are not trading in particular months"""
-    months_list = get_months_list(f_startdate, f_enddate)
+    months_list = get_months_list(f1, f2)
     
     tradeable_list = []
     for rs in track_df["rs"]:
-        tradeable_month = get_tradeable_month(df = rs.df.loc[:b_enddate])
+        tradeable_month = get_tradeable_month(df = rs.df.loc[:enddate])
         tradeable = np.array([j in tradeable_month for j in months_list]).any()
         tradeable_list.append(tradeable)
-    track_df["tradable"] = tradeable_list
-    
-    exclude_season_meta_df = track_df.loc[~track_df["tradable"], :].copy()
-    to_remove_strat = track_df.loc[~track_df["tradable"], "Name"].values
+
+    # track_df["tradable"] = tradeable_list
+    not_tradeable_list = [not j for j in tradeable_list]
+    exclude_season_meta_df = track_df.loc[not_tradeable_list, :].copy()
+    to_remove_strat = exclude_season_meta_df.loc[:, "Name"].values
     # self.log("Removing Inactive Seasonalities Strategies: {}".format(to_remove_strat), "Exclude_SeasonalityMonth")
     
-    track_df = track_df.loc[track_df["tradable"]]
+    track_df = track_df.loc[tradeable_list ,:]
     return track_df, exclude_season_meta_df
 
 

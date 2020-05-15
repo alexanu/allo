@@ -1,0 +1,31 @@
+startdate: 2016-01-01 00:00:00
+enddate: 2019-01-01 00:00:00
+rebalance_frequency: 45
+selector_lookback: 180
+allocator_lookback: 180
+
+allocator_kwargs:
+  adj_lowerbound: 0.008
+  allocate_method: constrained_risk_parity
+  strat_min_alloc: {}
+  upperbound: 0.3
+excluder_kwargs:
+- kwargs:
+    corr_threshold: 0.9
+  name: exclude_high_correlation
+- kwargs: {}
+  name: exclude_seasonality_month
+- kwargs: {}
+  name: exclude_data_mined
+find_filter:
+  User:
+    $in:
+    - Benchmark
+    $nin:
+    - Deleted
+
+sample_population_n: 10000
+sample_population_seed: 123
+sample_threshold: 2
+selector_kwargs:
+  select_method: select_all

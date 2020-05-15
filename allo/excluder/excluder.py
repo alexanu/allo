@@ -12,16 +12,16 @@ class Excluder(object):
     NA
     """
     def __init__(self, track_df, date_kwargs, excluder_kwargs):
-        excluded_df_list = []
+        excluded = {}
         if len(excluder_kwargs) > 0:
             for kw in excluder_kwargs:
                 name, kwargs = kw.get("name"), kw.get("kwargs")
                 kwargs = {**kwargs, **date_kwargs}
                 exclude_fun = custom_exclude.get(name)
                 track_df, excluded_df = exclude_fun(track_df, **kwargs)
-                excluded_df_list.append(excluded_df.copy())
+                excluded[name] = excluded_df
 
-        self.track_df, self.excluded_df_list = track_df, excluded_df_list
+        self.track_df, self.excluded = track_df, excluded
     
     def get_output(self):
-        return self.track_df, self.excluded_df_list
+        return self.track_df, self.excluded
