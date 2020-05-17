@@ -42,7 +42,7 @@ class SingleIntervalAllocator(object):
         
         self.MS = MongoStorage() # Initialize MongoStorage 
         meta_list = self.get_full_meta(find_filter, **date_kwargs) # Get full population metadata
-        if len(meta_list) > sample_threshold:
+        if len(meta_list) >= sample_threshold:
             track_df, excluded_0 = self.sample_from_population(meta_list, n = sample_population_n, seed = sample_population_seed)
 
             # Exclude, Select, Allocate                                                                        
