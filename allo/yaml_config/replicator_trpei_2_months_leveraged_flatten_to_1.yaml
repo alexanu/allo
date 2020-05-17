@@ -1,18 +1,16 @@
 startdate: 2014-01-01 00:00:00
-enddate: 2020-01-01 00:00:00
-# enddate: 2020-03-01 00:00:00
+enddate: 2020-03-01 00:00:00
 index: trpei
 lookback_num_month: 2
-add_drift: 0.0025
 
 allocator_kwargs:
   adj_lowerbound: 0.00
   allocate_method: replicate_minimize_lookback_square_error
   strat_min_alloc: {}
   constraint: 1
-  lowerbound: -0.6
-  upperbound: 1.2
-  sum_weight: 1.0
+  lowerbound: -1.5
+  upperbound: 2
+  sum_weight: 1.
   multiplicative_rescale: 1
   
 excluder_kwargs:

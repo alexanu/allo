@@ -12,7 +12,7 @@ allocator_kwargs:
   constraint: 1
   lowerbound: -0.6
   upperbound: 1.2
-  sum_weight: 1.0
+  sum_weight: 1
   multiplicative_rescale: 1
   
 excluder_kwargs:
