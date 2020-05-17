@@ -21,7 +21,7 @@ class Allocator(object):
     NA
     """
     # @timeit
-    def __init__(self, track_df, allocate_method, a1, a2, adj_lowerbound = 0, strat_min_alloc = {}, **kwargs):
+    def __init__(self, track_df, allocate_method, a1, a2, adj_lowerbound = 0, strat_min_alloc = {}, multiplicative_rescale = -1, **kwargs):
         rseries_list = track_df["rs"].values
         strategy_list = track_df["Name"].values
 
@@ -45,6 +45,10 @@ class Allocator(object):
 
         # Adjustment for forced min weights
         self.output_df = adjust_forced_min_weight(output_df, strat_min_alloc) 
+        
+        if multiplicative_rescale != -1:
+            self.output_df["weight_2"] = output_df["weight"].copy()
+            self.output_df["weight"] = self.output_df["weight"]*(multiplicative_rescale/self.output_df["weight"].sum())
         
     def get_output(self):
         return self.output_df
