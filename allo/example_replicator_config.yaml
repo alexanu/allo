@@ -1,15 +1,15 @@
-a1: 2016-01-01 00:00:00
-a2: 2019-01-01 00:00:00
-s1: 2016-01-01 00:00:00
-s2: 2019-01-01 00:00:00
-f1: 2019-01-01 00:00:00
-f2: 2019-03-01 00:00:00
+startdate: 2014-01-01 00:00:00
+enddate: 2020-03-01 00:00:00
+index: trpei
 
 allocator_kwargs:
-  adj_lowerbound: 0.008
-  allocate_method: constrained_risk_parity
+  adj_lowerbound: 0.00
+  allocate_method: replicate_minimize_lookback_square_error
   strat_min_alloc: {}
-  upperbound: 0.3
+  lowerbound: -0.75
+  upperbound: 1.5
+  sum_weight: 1.0
+  constraint: 1
 excluder_kwargs:
 - kwargs:
     corr_threshold: 0.9
@@ -19,9 +19,17 @@ excluder_kwargs:
 - kwargs: {}
   name: exclude_data_mined
 find_filter:
-  User:
+  Name:
     $in:
-    - Benchmark
+    - SPY
+    - TLT
+    - GLD
+  SeriesType: 
+    $in:
+    - yahoo
+  User:
+#     $in:
+#     - Benchmark
     $nin:
     - Deleted
 

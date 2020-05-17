@@ -3,14 +3,13 @@ import datetime
 import numpy as np
 import pandas as pd
 
-# from cxtpy.metrics_functions import *
+from cxtpy.metrics_functions import cumulative_returns
 from data.mongo_storage import MongoStorage
-
 from helper.time import timeit
 from excluder.excluder import Excluder
 from selector.selector import Selector
 from allocator.allocator import Allocator
-
+from allocator.custom_allocate import get_df_combined_from_rs_list
 
 # To-add features: use `pip install logzero` to log?
 class SingleIntervalAllocator(object):
@@ -51,11 +50,14 @@ class SingleIntervalAllocator(object):
             track_df, excluded_2 = Selector(track_df, **selector_kwargs).get_output()
             track_df = Allocator(track_df, **allocator_kwargs).get_output()
             excluded = {**excluded_0, **excluded_1, **excluded_2}
+            forward_df = self.construct_forward_series(track_df, f1, f2)
+            self.track_df, self.excluded, self.forward_df = track_df, excluded, forward_df
 
-            self.track_df, self.excluded = track_df, excluded
-
-    def get_output(self):
-        return self.subset_track_df(self.track_df), self.excluded
+    def get_output(self, subset = True):
+        if subset:
+            return self.subset_track_df(self.track_df), self.excluded, self.forward_df
+        else:
+            return self.track_df, self.excluded, self.forward_df
 
     def construct_dates(self, s1, s2, a1, a2, f1, f2, **kwargs):
         startdate, enddate = min(s1, a1), max(s2,a2)
@@ -112,6 +114,18 @@ class SingleIntervalAllocator(object):
         p2 = track_df.loc[:,needed_columns]
         sub_track_df = pd.concat([p2, p1], axis = 1)
         return sub_track_df
+
+    def construct_forward_series(self, track_df, f1, f2, **kwargs):
+        rs_list = track_df["rs"].values
+        w_list = track_df["weight"].values
+        
+        dfc = get_df_combined_from_rs_list(rs_list = rs_list, d1 = f1, d2 = f2)
+        allocated_df = dfc*w_list
+        allocated_df = allocated_df.fillna(0)
+        portfolio_df = pd.DataFrame(allocated_df.sum(axis = 1), columns = ["pret"])
+        portfolio_df["pcret"] = cumulative_returns(portfolio_df["pret"])
+        return portfolio_df.copy()
+
 
     # if self.meta_df.shape[0] > 0:
     #     self.Select(**kwargs)

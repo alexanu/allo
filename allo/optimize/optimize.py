@@ -9,11 +9,11 @@ from pypfopt.efficient_frontier import EfficientFrontier
 from pypfopt.expected_returns import prices_from_returns, mean_historical_return, ema_historical_return
 
 
-def OptimizeWeights(rdf, fun, lowerbound, upperbound, method, tol = 1e-8, constraint = True):
+def OptimizeWeights(rdf, fun, lowerbound, upperbound, method, tol = 1e-8, constraint = True, sum_weight = 1):
     N = rdf.values.shape[1]
     if constraint:
         cons = (
-                    {'type': 'eq', 'fun': lambda x:  np.sum(x)-1},
+                    {'type': 'eq', 'fun': lambda x:  np.sum(x)-sum_weight},
                )
     else:
         cons = ()

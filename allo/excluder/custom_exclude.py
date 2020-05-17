@@ -39,7 +39,8 @@ def exclude_high_correlation(track_df, enddate, corr_threshold = 0.8, **kwargs):
         exclude_corr_meta_df = track_df.loc[track_df["Name"].isin(to_remove_strat)].copy()
         track_df = track_df.loc[~track_df["Name"].isin(to_remove_strat)]
     else:
-        print("No Highly Correlated Strategies.", "Exclude_HighCorrelation_3")
+        ""
+        # print("No Highly Correlated Strategies.", "Exclude_HighCorrelation_3")
         # self.log("No Highly Correlated Strategies.", "Exclude_HighCorrelation_3")
     return track_df, exclude_corr_meta_df
 

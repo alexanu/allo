@@ -8,16 +8,22 @@ import numpy as np
 import pandas as pd
 
 import optimize
+from optimize import optimize
+from optimize import lambda_optimize
+
 from allocator.risk_parity import risk_parity
 from allocator.final_adjustment import flatten_upperbound
 from helper.temp_metrics import ETL # move metrics to cxtpy
 
 
-def get_df_combined_from_rs_list(rs_list, d1 = datetime.datetime(2000,1,1), d2 = datetime.datetime(3000,1,1)):
+def get_df_combined_from_rs_list(rs_list, d1 = datetime.datetime(2000,1,1), d2 = None):
     """Extract df_combined from rs_list given date constraint: `(d1,d2)`."""
     df_list = []
     for rs in rs_list:
-        temp_df = rs.df.loc[d1:d2].copy()
+        if d2 is None:
+            temp_df = rs.df.loc[d1:].copy()
+        else:
+            temp_df = rs.df.loc[d1:d2].copy()
         temp_df.columns = [rs.Name]
         df_list.append(temp_df)
     
@@ -50,13 +56,13 @@ def constrained_tail_risk_parity(rseries_list, strategy_list, a1, a2, upperbound
     return w
 
 
-def constrained_max_sharpe(rseries_list, a1, a2, lowerbound, upperbound, optimize_method = None, **kwargs):
+def constrained_max_sharpe(rseries_list, strategy_list, a1, a2, lowerbound, upperbound, optimize_method = None, **kwargs):
     """Constrained Max Sharpe (CMS)"""
     allocate_back_df = get_df_combined_from_rs_list(rs_list = rseries_list, d1 = a1, d2 = a2).fillna(0)
 
-    fun = optimize.lambda_optimize.get("Weights_MaxSharpePenalty_fun")
+    fun = lambda_optimize.get("Weights_MaxSharpePenalty_fun")
     fun = fun(allocate_back_df)
-    w, res = optimize.optimize.OptimizeWeights(allocate_back_df, fun, lowerbound = lowerbound, upperbound = upperbound, 
+    w, res = optimize.OptimizeWeights(allocate_back_df, fun, lowerbound = lowerbound, upperbound = upperbound, 
                                 method = optimize_method, tol = 1e-8, constraint = True)
     return w
 
@@ -81,10 +87,10 @@ def avg_cms_crpt(rseries_list, strategy_list, a1, a2, lowerbound, upperbound, ta
     return w
 
 
-def chrp(rseries_list, a1, a2, upperbound, **kwargs):
+def chrp(rseries_list, strategy_list, a1, a2, upperbound, **kwargs):
     """Constrained Hierarchical Risk Parity"""
     allocate_back_df = get_df_combined_from_rs_list(rs_list = rseries_list, d1 = a1, d2 = a2).fillna(0)
-    w = optimize.optimize.optimize_hrp(allocate_back_df)
+    w = optimize.optimize_hrp(allocate_back_df)
     w2 = [j for j in w.values()]
     w2 = flatten_upperbound(w2, upperbound)
     for key,val in zip(w.keys(), w2):
@@ -92,27 +98,27 @@ def chrp(rseries_list, a1, a2, upperbound, **kwargs):
     return w
 
 
-def cewms(rseries_list, a1, a2, lowerbound, upperbound, **kwargs):
+def cewms(rseries_list, strategy_list, a1, a2, lowerbound, upperbound, **kwargs):
     """Constrained Exponential Weighted Max Sharpe"""
     allocate_back_df = get_df_combined_from_rs_list(rs_list = rseries_list, d1 = a1, d2 = a2).fillna(0)
-    w = optimize.optimize.optimize_max_sharpe(allocate_back_df, lowerbound, upperbound)
+    w = optimize.optimize_max_sharpe(allocate_back_df, lowerbound, upperbound)
     return w
 
 
-def equal_weight(rseries_list, a1, a2, **kwargs):
+def equal_weight(rseries_list, strategy_list, a1, a2, **kwargs):
     """Equal weight"""
     allocate_back_df = get_df_combined_from_rs_list(rs_list = rseries_list, d1 = a1, d2 = a2).fillna(0)
-    w = optimize.optimize.optimize_equal_weight(allocate_back_df)
+    w = optimize.optimize_equal_weight(allocate_back_df)
     return w
 
 
-def replicate_minimize_lookback_square_error(rseries_list, a1, a2, lowerbound, upperbound, target_ret, optimize_method = None, constraint = True, **kwargs):
+def replicate_minimize_lookback_square_error(rseries_list, strategy_list, a1, a2, lowerbound, upperbound, target_ret, optimize_method = None, constraint = True, sum_weight = 1, **kwargs):
     """For Replicate: Minimize the lookback square error of optimized returns and target returns"""
     allocate_back_df = get_df_combined_from_rs_list(rs_list = rseries_list, d1 = a1, d2 = a2).fillna(0)
-    fun = optimize.lambda_optimize.get("Weights_MinTargetErr")
+    fun = lambda_optimize.get("Weights_MinTargetErr")
     fun = fun(allocate_back_df, target_ret)
-    w, res = OptimizeWeights(allocate_back_df, fun, lowerbound = lowerbound, upperbound = upperbound, 
-                                method = optimize_method, tol = 1e-8, constraint = constraint)
+    w, res = optimize.OptimizeWeights(allocate_back_df, fun, lowerbound = lowerbound, upperbound = upperbound, 
+                                method = optimize_method, tol = 1e-8, constraint = constraint, sum_weight = sum_weight)
     return w
 
 
