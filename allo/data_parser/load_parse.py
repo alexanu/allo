@@ -26,7 +26,7 @@ def trpei():
     tdf = pd.DataFrame(tdf)
     tdf.columns = ["TRPEI"]
 
-    return target_ret_dict #, tdf
+    return target_ret_dict, tdf
 
 
 def get(identifier):

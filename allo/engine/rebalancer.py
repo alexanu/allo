@@ -3,6 +3,7 @@ import datetime
 import numpy as np
 import pandas as pd
 
+from data.series import RSeries
 from cxtpy.metrics_functions import cumulative_returns
 from engine.single_interval_allocator import SingleIntervalAllocator
 
@@ -44,32 +45,43 @@ class Rebalancer(object):
             latest += datetime.timedelta(days = rebalance_frequency)
         return date_packet_list
 
-    def post_processing(self):
-        self.fdf = self.construct_entire_series() 
-
-    def construct_entire_series(self):
-        df = pd.concat([j["forward_df"] for j in self.output])
-        df["pcret"] = cumulative_returns(df["pret"])
-        return df
-            
     def save_output(self, track_df, excluded, date_packet, forward_df):
         output_packet = {"track_df": track_df, "excluded": excluded, "date_packet": date_packet, "forward_df": forward_df}
         self.output.append(output_packet)
 
-    def get_output(self):
-        return self.output, self.fdf
+    def post_processing(self):
+        self.construct_entire_series() 
+        self.compile_weights()
 
-    def get_weights(self):
+    def construct_entire_series(self):
+        df = pd.concat([j["forward_df"] for j in self.output])
+        df["pcret"] = cumulative_returns(df["pret"])
+        
+        rs = RSeries()
+        rdf = df[["pret"]]
+        rs.load_custom_series(rdf, custom_series_name = "custom_allocate_series", series_type = "CustomAllo")
+        
+        self.fdf = df
+        self.rs = rs
+
+    def compile_weights(self, override_weight = "weight"):
         tdf_list = []
         for output_packet in self.output:
             f1 = output_packet["date_packet"]["f1"]
             f2 = output_packet["date_packet"]["f2"]
             track_df = output_packet["track_df"]
-            tdf = track_df[["Name", "weight"]].set_index("Name").T.copy()
+            tdf = track_df[["Name", override_weight]].set_index("Name").T.copy()
             tdf["f1"] = f1
             tdf["f2"] = f2
             tdf = tdf.reset_index(drop = True).set_index(["f1", "f2"])
             tdf_list.append(tdf)
-        tdf = pd.concat(tdf_list)
-        return tdf
+        self.weights_df =  pd.concat(tdf_list)
+    
+    def get_output(self):
+        return self.output, self.fdf
 
+    def get_weights(self):
+        return self.weights_df
+
+    def get_metrics(self):
+        return self.rs.get_metrics()

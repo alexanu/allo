@@ -12,11 +12,13 @@ from cxtpy.metrics_functions import rolling_metrics
 from data.mongo_datetime import dt, dtnow, get_collection
 from data.init_mongo import InitMongo
 
+
 def truncate_initial_zeros(df):
     tdf = df.copy()
     tdf[tdf==0] = np.nan
     tdf = tdf.loc[tdf.first_valid_index():].fillna(0)
     return tdf
+
 
 def generate_date_list(startdate, enddate, lookback_days, skip_days):
     refstartdate = enddate
@@ -32,6 +34,7 @@ def generate_date_list(startdate, enddate, lookback_days, skip_days):
         date_dict_list.append(date_dict)
 
     return date_dict_list
+
 
 class RSeries():
     def __init__(self):
